@@ -16,6 +16,7 @@ def midi_to_numpy(file_path):
     midi_data = pretty_midi.PrettyMIDI(file_path)
     piano_roll = midi_data.get_piano_roll(fs=4)
     piano_roll = piano_roll[:NUM_FEATURES, :]
+    piano_roll[piano_roll > 0] = 1
     return piano_roll.T
 
 # 创建训练数据和标签
@@ -34,6 +35,8 @@ def read_midi_files(midi_folder):
         for file in files:
             if file.endswith(".midi") or file.endswith(".mid"):
                 file_path = os.path.join(root, file)
+                data
+
                 data = midi_to_numpy(file_path)
                 all_data.append(data)
     return np.vstack(all_data)
@@ -49,7 +52,7 @@ X, y = create_sequences(data, NUM_TIMESTEPS)
 model = Sequential([
     LSTM(256, input_shape=(NUM_TIMESTEPS, NUM_FEATURES), return_sequences=True),
     Dropout(0.2),
-    LSTM(256, return_sequences=False),
+    LSTM(256),
     Dropout(0.2),
     Dense(NUM_FEATURES, activation='sigmoid')
 ])
